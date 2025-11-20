@@ -1,0 +1,592 @@
+/* Tailwind CSS directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Performance & Smooth Scrolling Optimizations */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: white;
+}
+
+.main-container {
+  min-height: 100vh;
+  scroll-behavior: smooth;
+}
+
+#root {
+  width: 100%;
+}
+
+
+
+/* Custom animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background: linear-gradient(135deg, #1e1b4b 0%, #1e3a8a 50%, #312e81 100%);
+  }
+  33% {
+    background: linear-gradient(135deg, #312e81 0%, #1e1b4b 50%, #1e3a8a 100%);
+  }
+  66% {
+    background: linear-gradient(135deg, #1e3a8a 0%, #312e81 50%, #1e1b4b 100%);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px);
+    opacity: 0.3;
+  }
+  25% {
+    transform: translateY(-20px) translateX(10px);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-10px) translateX(-10px);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translateY(-30px) translateX(5px);
+    opacity: 0.7;
+  }
+}
+
+@keyframes pulseSlow {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes bounceSlow {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-10px) scale(1.02);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+.animate-gradient-shift {
+  animation: gradientShift 8s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 8s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulseSlow 4s ease-in-out infinite;
+}
+
+.animate-bounce-slow {
+  animation: bounceSlow 6s ease-in-out infinite;
+}
+
+
+
+/* Focus styles */
+.focus-visible:focus {
+  outline: 2px solid #8b5cf6;
+  outline-offset: 2px;
+}
+
+/* Custom button hover effects */
+.btn-hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Optimized Card hover effects - Reduced complexity */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Performance Optimizations - Reduced will-change usage */
+* {
+  box-sizing: border-box;
+}
+
+/* Only apply transforms to specific interactive elements */
+.interactive-button {
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.interactive-button:hover {
+  transform: translateY(-1px);
+}
+
+.interactive-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.interactive-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Loading spinner */
+.spinner {
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #8b5cf6;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Landing page specific background */
+.main-container {
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Responsive utilities */
+@media (max-width: 640px) {
+  .mobile-padding {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Custom slider styles */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-track {
+  background: #e5e7eb;
+  height: 8px;
+  border-radius: 4px;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  background: #8b5cf6;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.slider::-moz-range-track {
+  background: #e5e7eb;
+  height: 8px;
+  border-radius: 4px;
+  border: none;
+}
+
+.slider::-moz-range-thumb {
+  background: #8b5cf6;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Simplified Gradient Background - Better Performance */
+.gradient-background {
+  background: linear-gradient(45deg, #0e1938, #6b41bf, #f359d2, #ffc2c3);
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Simplified background effect - only 2 gradients instead of 6 */
+.gradient-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle 150px at 20% 30%, rgba(255, 255, 255, 0.3) 0%, transparent 60%),
+    radial-gradient(circle 100px at 80% 70%, rgba(255, 192, 203, 0.25) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Simplified Event Category Background */
+.event-categories-page {
+  background: linear-gradient(45deg, #0e1938, #6b41bf, #f359d2, #ffc2c3);
+  position: relative;
+  min-height: 100vh;
+}
+
+.event-categories-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle 120px at 25% 30%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
+    radial-gradient(circle 80px at 75% 70%, rgba(255, 192, 203, 0.25) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Simplified Corporate Events Background */
+.corporate-events-grid {
+  background: white;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Simplified Conference Form Background */
+.conference-form-page {
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Ensure content stays above background */
+.gradient-background > *,
+.event-categories-page > *,
+.corporate-events-grid > *,
+.conference-form-page > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Removed heavy animated bokeh effects for better performance */
+
+/* Simplified responsive adjustments */
+@media (max-width: 768px) {
+  .gradient-background::before,
+  .event-categories-page::before,
+  .corporate-events-grid::before,
+  .conference-form-page::before {
+    background-image: 
+      radial-gradient(circle 60px at 25% 35%, rgba(255, 255, 255, 0.2) 0%, transparent 40%),
+      radial-gradient(circle 40px at 75% 65%, rgba(255, 192, 203, 0.15) 0%, transparent 40%);
+  }
+}
+
+/* Soft Pastel Romantic Theme */
+:root {
+  --theme-bg: #FDF6E3;        /* Light beige background */
+  --theme-accent1: #F8C8DC;   /* Blush pink accents */
+  --theme-accent2: #FEF3C7;   /* Pale yellow (gold-foil-like) */
+  --theme-accent3: #DBEAFE;   /* Light blue (delicate waves) */
+  --theme-border: #F8C8DC;    /* Blush pink borders */
+  --theme-primary: #F59E0B;   /* Muted gold */
+  --theme-button-dark: #D97706;
+  --theme-button-hover: #F59E0B;
+}
+
+/* Smooth transitions for theme changes */
+body,
+.decor-dot1,
+.decor-dot2,
+.decor-dot3,
+.dashed-circle,
+.section-heading,
+.form-heading,
+.form-field,
+.continue-btn,
+.previous-btn {
+  transition: all 0.3s ease;
+}
+
+/* Romantic Theme Elements */
+.romantic-theme {
+  background: linear-gradient(45deg, #0e1938, #6b41bf, #f359d2, #ffc2c3);
+  position: relative;
+}
+
+/* Watercolor Hearts */
+.watercolor-heart {
+  position: absolute;
+  width: 20px;
+  height: 18px;
+  opacity: 0.1;
+  background: radial-gradient(circle, var(--theme-accent1) 0%, transparent 70%);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  transform: rotate(-45deg);
+  animation: float 6s ease-in-out infinite;
+}
+
+.watercolor-heart::before,
+.watercolor-heart::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 19px;
+  background: radial-gradient(circle, var(--theme-accent1) 0%, transparent 70%);
+  border-radius: 50px 50px 0 0;
+  transform: rotate(-45deg);
+  transform-origin: 0 100%;
+}
+
+.watercolor-heart::after {
+  left: 0;
+  transform: rotate(45deg);
+  transform-origin: 100% 100%;
+}
+
+/* House Icon */
+.house-icon {
+  position: relative;
+  width: 24px;
+  height: 20px;
+  background: var(--theme-accent2);
+  border-radius: 0 0 4px 4px;
+  opacity: 0.6;
+}
+
+.house-icon::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-bottom: 12px solid var(--theme-accent2);
+}
+
+.house-icon::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  width: 8px;
+  height: 10px;
+  background: var(--theme-bg);
+  border-radius: 2px;
+}
+
+/* Delicate Wave Patterns */
+.wave-pattern {
+  position: absolute;
+  width: 100%;
+  height: 60px;
+  background: linear-gradient(90deg, transparent 0%, var(--theme-accent3) 50%, transparent 100%);
+  opacity: 0.3;
+  border-radius: 50px;
+  animation: wave 8s ease-in-out infinite;
+}
+
+@keyframes wave {
+  0%, 100% { transform: translateX(-20px) scaleY(0.8); }
+  50% { transform: translateX(20px) scaleY(1.2); }
+}
+
+/* Rounded Corners and Gentle Gradients */
+.romantic-card {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 200, 220, 0.1) 100%);
+  border: 1px solid var(--theme-border);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(248, 200, 220, 0.2);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.romantic-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(248, 200, 220, 0.3);
+}
+
+/* Elegant Typography */
+.romantic-text {
+  color: #8B5A5A;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  line-height: 1.6;
+}
+
+.romantic-heading {
+  color: var(--theme-primary);
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 4px rgba(248, 200, 220, 0.3);
+}
+
+/* RSVP Button Styling */
+.rsvp-button {
+  background: linear-gradient(135deg, var(--theme-primary) 0%, #E8890B 100%);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 12px 32px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.rsvp-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.rsvp-button:hover::before {
+  left: 100%;
+}
+
+.rsvp-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+}
+
+/* Minimalist Layout Enhancements */
+.romantic-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  position: relative;
+}
+
+/* Decorative Elements */
+.romantic-decoration {
+  position: absolute;
+  pointer-events: none;
+}
+
+.romantic-decoration.top-left {
+  top: 20px;
+  left: 20px;
+}
+
+.romantic-decoration.top-right {
+  top: 20px;
+  right: 20px;
+}
+
+.romantic-decoration.bottom-left {
+  bottom: 20px;
+  left: 20px;
+}
+
+.romantic-decoration.bottom-right {
+  bottom: 20px;
+  right: 20px;
+}
+
+/* Hide scrollbars while maintaining scroll functionality - ONLY for specific components */
+.scrollbar-hide-specific {
+  scrollbar-width: none;
+}
+
+.scrollbar-hide-specific::-webkit-scrollbar {
+  display: none;
+}
+
+/* Unified Romantic Theme for All Events */
+.theme-wedding,
+.theme-conference,
+.theme-birthday,
+.theme-diwali-celebration,
+.theme-workshop,
+.theme-school-annual-day,
+.theme-science-fair,
+.theme-corporate,
+.theme-social,
+.theme-cultural,
+.theme-religious,
+.theme-festival,
+.theme-political,
+.theme-sports,
+.theme-educational,
+.theme-health,
+.theme-environmental,
+.theme-virtual,
+.theme-entertainment,
+.theme-community {
+  --theme-bg: #FDF6E3;
+  --theme-accent1: #F8C8DC;
+  --theme-accent2: #FEF3C7;
+  --theme-accent3: #DBEAFE;
+  --theme-border: #F8C8DC;
+  --theme-primary: #F59E0B;
+  --theme-button-dark: #D97706;
+  --theme-button-hover: #F59E0B;
+}

@@ -1,0 +1,48 @@
+# Production requirements - additional packages for production deployment
+
+# Production WSGI server
+gunicorn==21.2.0
+gevent==23.9.1
+
+# Redis for caching and sessions
+redis==5.0.1
+django-redis==5.4.0
+
+# Database optimizations
+psycopg2-binary==2.9.9
+
+# Security enhancements
+django-security==0.17.0
+django-ratelimit==4.1.0
+
+# Monitoring and logging
+sentry-sdk[django]==1.38.0
+django-prometheus==2.3.1
+
+# Performance monitoring
+django-debug-toolbar==4.2.0
+django-extensions==3.2.3
+
+# Health checks
+django-health-check==3.17.0
+
+# Static file serving
+whitenoise[brotli]==6.6.0
+
+# Environment management
+python-decouple==3.8
+
+# Testing (for CI/CD)
+pytest==7.4.3
+pytest-django==4.7.0
+pytest-cov==4.1.0
+factory-boy==3.3.0
+
+# Code quality
+black==23.11.0
+flake8==6.1.0
+isort==5.12.0
+
+# Documentation
+sphinx==7.2.6
+sphinx-rtd-theme==1.3.0

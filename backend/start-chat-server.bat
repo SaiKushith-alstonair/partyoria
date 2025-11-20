@@ -1,0 +1,3 @@
+@echo off
+echo Starting Production Chat Server...
+python chat_server.py
