@@ -319,7 +319,7 @@ const RequirementQuestionsModal: React.FC<RequirementQuestionsModalProps> = ({
         }
       }}
     >
-      <div className="bg-white/95 backdrop-blur-xl rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-hidden border border-white/30 shadow-2xl">
+      <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-hidden border border-gray-200 shadow-2xl">
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-xl font-semibold text-gray-800">
             {requirement.label} - Additional Details
@@ -332,7 +332,7 @@ const RequirementQuestionsModal: React.FC<RequirementQuestionsModalProps> = ({
           </button>
         </div>
 
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-180px)] bg-gradient-to-br from-purple-50 via-amber-50 to-orange-50">
+        <div className="p-6 overflow-y-auto max-h-[calc(90vh-180px)] bg-white">
           {loading ? (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
@@ -340,7 +340,7 @@ const RequirementQuestionsModal: React.FC<RequirementQuestionsModalProps> = ({
           ) : (
             <div className="space-y-6">
               {currentView === 'gallery' && galleryImages.length > 0 && (
-                <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 border border-white/30 shadow-sm">
+                <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
                   <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center flex items-center justify-center gap-3">
                     <span>🖼️</span> {requirement.label} Gallery
                   </h3>
@@ -414,7 +414,7 @@ const RequirementQuestionsModal: React.FC<RequirementQuestionsModalProps> = ({
                       
                       <div className="grid gap-6">
                         {questions.map((question, index) => (
-                          <div key={question.id} className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border border-white/40 shadow-lg hover:shadow-xl transition-all duration-300">
+                          <div key={question.id} className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300">
                             <div className="flex items-start gap-4">
                               <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
                                 {index + 1}

@@ -603,7 +603,7 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
             type="text"
             value={formData.eventName}
             onChange={(e) => handleInputChange('eventName', e.target.value)}
-            className={`input-field ${errors.eventName ? 'border-error-500 bg-error-50' : 'border-gray-300'}`}
+            className={`input-field ${errors.eventName ? 'border-error-500 bg-error-50' : 'border-gray-300 bg-white'}`}
             placeholder={`Enter ${subsection?.name.toLowerCase()} name`}
           />
           {errors.eventName && <FieldError message={errors.eventName} />}
@@ -617,7 +617,7 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
             type="text"
             value={formData.clientName}
             onChange={(e) => handleInputChange('clientName', e.target.value)}
-            className={`input-field ${errors.clientName ? 'border-error-500 bg-error-50' : 'border-gray-300'}`}
+            className={`input-field ${errors.clientName ? 'border-error-500 bg-error-50' : 'border-gray-300 bg-white'}`}
             placeholder="Enter your full name"
           />
           {errors.clientName && <FieldError message={errors.clientName} />}
@@ -631,7 +631,7 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
             type="email"
             value={formData.clientEmail}
             onChange={(e) => handleInputChange('clientEmail', e.target.value)}
-            className={`input-field ${errors.clientEmail ? 'border-error-500 bg-error-50' : 'border-gray-300'}`}
+            className={`input-field ${errors.clientEmail ? 'border-error-500 bg-error-50' : 'border-gray-300 bg-white'}`}
             placeholder="your@email.com"
           />
           {errors.clientEmail && <FieldError message={errors.clientEmail} />}
@@ -645,7 +645,7 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
             type="tel"
             value={formData.clientPhone}
             onChange={(e) => handleInputChange('clientPhone', e.target.value)}
-            className={`input-field ${errors.clientPhone ? 'border-error-500 bg-error-50' : 'border-gray-300'}`}
+            className={`input-field ${errors.clientPhone ? 'border-error-500 bg-error-50' : 'border-gray-300 bg-white'}`}
             placeholder="+91 98765 43210"
           />
           {errors.clientPhone && <FieldError message={errors.clientPhone} />}
@@ -666,7 +666,7 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
                 handleInputChange('attendees', value || 0);
               }
             }}
-            className={`input-field ${errors.attendees ? 'border-error-500 bg-error-50' : 'border-gray-300'}`}
+            className={`input-field ${errors.attendees ? 'border-error-500 bg-error-50' : 'border-gray-300 bg-white'}`}
             placeholder="50"
             min="1"
           />

@@ -456,7 +456,7 @@ const Onboarding = () => {
       {currentStep > 2 && (
         <button
           onClick={handleBack}
-          className="fixed top-8 left-8 p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full hover:bg-white/20 transition-all text-white"
+          className="fixed top-8 left-8 p-3 bg-white border border-gray-300 rounded-full hover:bg-gray-100 transition-all text-gray-700"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
@@ -506,7 +506,7 @@ const Onboarding = () => {
                     type="text"
                     placeholder="Enter your full name"
                     autoComplete="name"
-                    className={`h-16 text-xl bg-white/10 border-white/20 text-white placeholder:text-white/50 backdrop-blur-sm ${
+                    className={`h-16 text-xl bg-white border-gray-300 text-gray-900 placeholder:text-gray-500 ${
                       errors.fullName ? "border-red-400" : ""
                     }`}
                     onChange={(e) => {
@@ -541,7 +541,7 @@ const Onboarding = () => {
                       type="tel"
                       placeholder="Enter your mobile number"
                       autoComplete="tel"
-                      className={`h-16 text-xl bg-white/10 border-white/20 text-white placeholder:text-white/50 backdrop-blur-sm ${
+                      className={`h-16 text-xl bg-white border-gray-300 text-gray-900 placeholder:text-gray-500 ${
                         errors.mobile ? "border-red-400" : ""
                       }`}
                       value={formData.mobile}
@@ -642,12 +642,12 @@ const Onboarding = () => {
                           handleNext(profession.label, "business");
                           setIsStepValid(true);
                         }}
-                        className="p-6 bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl hover:bg-white/20 transition-all hover:scale-105 group h-[140px] w-[140px] flex flex-col items-center justify-center shadow-lg hover:shadow-xl"
+                        className="p-6 bg-white border border-gray-300 rounded-3xl hover:bg-gray-100 transition-all hover:scale-105 group h-[140px] w-[140px] flex flex-col items-center justify-center shadow-lg hover:shadow-xl"
                       >
                         <div className="text-[55px] mb-1 group-hover:scale-110 transition-transform">
                           {profession.emoji}
                         </div>
-                        <p className="text-white font-semibold text-base text-center leading-tight">
+                        <p className="text-gray-800 font-semibold text-base text-center leading-tight">
                           {profession.label}
                         </p>
                       </button>
@@ -697,13 +697,13 @@ const Onboarding = () => {
                             }));
                             setIsStepValid(newServices.length > 0);
                           }}
-                          className={`p-6 backdrop-blur-sm border rounded-2xl transition-all hover:scale-105 h-[100px] w-full flex items-center justify-center shadow-lg ${
+                          className={`p-6 border rounded-2xl transition-all hover:scale-105 h-[100px] w-full flex items-center justify-center shadow-lg ${
                             isSelected
-                              ? "bg-white/30 border-white/60 text-white shadow-white/20"
-                              : "bg-white/10 border-white/20 text-white hover:bg-white/20"
+                              ? "bg-blue-100 border-blue-300 text-blue-800 shadow-blue-200"
+                              : "bg-white border-gray-300 text-gray-800 hover:bg-gray-100"
                           }`}
                         >
-                          <p className="text-white font-medium text-base text-center">
+                          <p className="font-medium text-base text-center">
                             {service.label}
                           </p>
                         </button>
@@ -746,7 +746,7 @@ const Onboarding = () => {
                     type="text"
                     placeholder="Enter your city"
                     autoComplete="address-level2"
-                    className={`h-14 text-lg bg-white/10 border-white/20 text-white placeholder:text-white/50 backdrop-blur-sm ${
+                    className={`h-14 text-lg bg-white border-gray-300 text-gray-900 placeholder:text-gray-500 ${
                       errors.city ? "border-red-400" : ""
                     }`}
                     onChange={(e) => {
@@ -780,7 +780,7 @@ const Onboarding = () => {
                     type="text"
                     placeholder="Enter your state"
                     autoComplete="address-level1"
-                    className={`h-14 text-lg bg-white/10 border-white/20 text-white placeholder:text-white/50 backdrop-blur-sm ${
+                    className={`h-14 text-lg bg-white border-gray-300 text-gray-900 placeholder:text-gray-500 ${
                       errors.state ? "border-red-400" : ""
                     }`}
                     onChange={(e) => {
@@ -813,7 +813,7 @@ const Onboarding = () => {
                     type="text"
                     placeholder="Enter your pincode"
                     autoComplete="postal-code"
-                    className={`h-14 text-lg bg-white/10 border-white/20 text-white placeholder:text-white/50 backdrop-blur-sm ${
+                    className={`h-14 text-lg bg-white border-gray-300 text-gray-900 placeholder:text-gray-500 ${
                       errors.pincode ? "border-red-400" : ""
                     }`}
                     onChange={(e) => {
