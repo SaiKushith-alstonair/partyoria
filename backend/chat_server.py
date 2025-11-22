@@ -93,15 +93,19 @@ def authenticate_user(token):
         return None
 
 @sio.event
-def connect(sid, environ):
+def connect(sid, environ, auth):
     """Handle client connection"""
     try:
-        # Get token from query params or headers
-        query_string = environ.get('QUERY_STRING', '')
+        # Get token from auth parameter or query params
         token = None
         
-        if 'token=' in query_string:
-            token = query_string.split('token=')[1].split('&')[0]
+        if auth and isinstance(auth, dict):
+            token = auth.get('token')
+        
+        if not token:
+            query_string = environ.get('QUERY_STRING', '')
+            if 'token=' in query_string:
+                token = query_string.split('token=')[1].split('&')[0]
         
         if not token:
             headers = environ.get('HTTP_AUTHORIZATION', '')

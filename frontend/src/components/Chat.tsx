@@ -424,7 +424,7 @@ export const Chat: React.FC = () => {
     const customerId = currentUser.user_type === 'customer' ? currentUser.id : user.id;
     
     // Check if conversation already exists
-    const existing = conversations.find(conv => 
+    const existing = (Array.isArray(conversations) ? conversations : []).find(conv => 
       conv.vendor.id === vendorId && conv.customer.id === customerId
     );
     
@@ -455,7 +455,7 @@ export const Chat: React.FC = () => {
     return currentUser?.id === conversation.vendor.id ? conversation.customer : conversation.vendor;
   };
 
-  const filteredConversations = conversations.filter(conv => {
+  const filteredConversations = (Array.isArray(conversations) ? conversations : []).filter(conv => {
     const otherUser = getOtherUser(conv);
     const displayName = otherUser.display_name || otherUser.username || '';
     return displayName.toLowerCase().includes(searchTerm.toLowerCase());
@@ -480,7 +480,7 @@ export const Chat: React.FC = () => {
       {showSearch && (
         <ConversationSearch
           onSelectConversation={(id) => {
-            const conv = conversations.find(c => c.id === id);
+            const conv = (Array.isArray(conversations) ? conversations : []).find(c => c.id === id);
             if (conv) setSelectedConversation(conv);
             setShowSearch(false);
           }}

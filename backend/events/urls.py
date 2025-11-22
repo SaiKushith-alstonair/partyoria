@@ -1,10 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import EventViewSet, QuoteRequestViewSet, RSVPViewSet, event_milestones
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from test_minimal_view import test_minimal_events
+
 from .budget_api import allocate_budget, update_budget, validate_budget, rebalance_budget, get_budget_summary
 from .quote_views import (
     send_quote_requests, vendor_quote_requests, quote_request_detail,
@@ -28,9 +25,7 @@ rsvp_router.register(r'', RSVPViewSet, basename='rsvp')
 urlpatterns = [
     # SPECIFIC PATTERNS FIRST - CRITICAL ORDER
     
-    # Test endpoint
-    path('test-minimal/', test_minimal_events, name='test-minimal-events'),
-    
+
     # Budget API endpoints
     path('events/<int:event_id>/budget/allocate/', allocate_budget, name='allocate-budget'),
     path('events/<int:event_id>/budget/update/', update_budget, name='update-budget'),
