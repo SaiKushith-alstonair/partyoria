@@ -1,36 +1,30 @@
 from rest_framework import serializers
-from .models import Venue, EventCategory, EventType, VendorService, EventVendorMapping, SpecialRequirement
+from .models import CalendarEvent
+from .booking_models import Booking
 
-class VenueSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Venue
-        fields = '__all__'
-
-class EventTypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = EventType
-        fields = '__all__'
-
-class EventCategorySerializer(serializers.ModelSerializer):
-    event_types = EventTypeSerializer(many=True, read_only=True)
+class CalendarEventSerializer(serializers.ModelSerializer):
+    booking = serializers.SerializerMethodField()
     
     class Meta:
-        model = EventCategory
-        fields = '__all__'
-
-class VendorServiceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = VendorService
-        fields = '__all__'
-
-class EventVendorMappingSerializer(serializers.ModelSerializer):
-    vendor_service = VendorServiceSerializer(read_only=True)
+        model = CalendarEvent
+        fields = ['id', 'title', 'event_date', 'description', 'location', 'booking', 'created_at']
+        read_only_fields = ['id', 'created_at']
     
-    class Meta:
-        model = EventVendorMapping
-        fields = '__all__'
+    def get_booking(self, obj):
+        if obj.booking:
+            return {
+                'customer_name': obj.booking.customer_name,
+                'amount': str(obj.booking.amount),
+                'status': obj.booking.status,
+                'service_type': obj.booking.service_type
+            }
+        return None
 
-class SpecialRequirementSerializer(serializers.ModelSerializer):
+class CreateCalendarEventSerializer(serializers.ModelSerializer):
     class Meta:
-        model = SpecialRequirement
-        fields = '__all__'
+        model = CalendarEvent
+        fields = ['title', 'event_date', 'description', 'location', 'booking']
+        
+    def create(self, validated_data):
+        validated_data['vendor'] = self.context['request'].user
+        return super().create(validated_data)

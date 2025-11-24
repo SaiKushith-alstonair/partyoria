@@ -17,23 +17,25 @@ interface BudgetManagerProps {
   initialAllocations?: BudgetAllocation;
 }
 
+// UNIFIED CATEGORY RULES - Matches backend exactly
 const CATEGORY_RULES = {
   catering: { min: 20, max: 50, required: true, label: 'Catering & Food' },
   venue: { min: 15, max: 40, required: true, label: 'Venue & Location' },
   decorations: { min: 5, max: 25, required: false, label: 'Decorations' },
-  entertainment: { min: 5, max: 20, required: false, label: 'Entertainment' },
   photography: { min: 5, max: 20, required: false, label: 'Photography/Video' },
-  audio_visual: { min: 5, max: 15, required: false, label: 'Audio Visual' },
-  lighting: { min: 2, max: 10, required: false, label: 'Lighting' },
-  transport: { min: 2, max: 15, required: false, label: 'Transportation' },
+  entertainment: { min: 5, max: 20, required: false, label: 'Entertainment' },
+  audio_visual: { min: 3, max: 15, required: false, label: 'Audio Visual' },
+  lighting: { min: 2, max: 12, required: false, label: 'Lighting' },
+  transportation: { min: 2, max: 15, required: false, label: 'Transportation' },
   security: { min: 1, max: 10, required: false, label: 'Security' },
   contingency: { min: 5, max: 15, required: true, label: 'Contingency' }
 };
 
+// UNIFIED EVENT PRESETS - Matches backend exactly
 const EVENT_PRESETS = {
-  wedding: { catering: 35, venue: 25, decorations: 15, photography: 10, entertainment: 8, contingency: 7 },
-  corporate: { venue: 30, catering: 25, audio_visual: 15, entertainment: 10, decorations: 8, transport: 7, contingency: 5 },
-  birthday: { catering: 30, venue: 20, entertainment: 20, decorations: 15, photography: 8, contingency: 7 }
+  wedding: { catering: 30, venue: 25, decorations: 15, photography: 12, entertainment: 8, lighting: 3, contingency: 7 },
+  corporate: { venue: 35, catering: 25, audio_visual: 15, entertainment: 8, photography: 5, transportation: 7, contingency: 5 },
+  birthday: { catering: 35, venue: 20, entertainment: 20, decorations: 12, photography: 6, contingency: 7 }
 };
 
 export const BudgetManager: React.FC<BudgetManagerProps> = ({

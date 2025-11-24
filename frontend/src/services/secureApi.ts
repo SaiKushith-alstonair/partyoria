@@ -242,7 +242,7 @@ class SecureApiService {
       throw new Error('Invalid event ID');
     }
     
-    return this.secureRequest<any>(`/events/${eventId}/budget-summary/`);
+    return this.secureRequest<any>(`/events/${eventId}/budget/summary/`);
   }
   
   async allocateBudget(eventId: number): Promise<any> {
@@ -250,7 +250,7 @@ class SecureApiService {
       throw new Error('Invalid event ID');
     }
     
-    return this.secureRequest<any>(`/events/${eventId}/allocate-budget/`, {
+    return this.secureRequest<any>(`/events/${eventId}/budget/allocate/`, {
       method: 'POST',
     });
   }
@@ -260,7 +260,7 @@ class SecureApiService {
       throw new Error('Invalid event ID');
     }
     
-    return this.secureRequest<any>(`/events/${eventId}/update-budget/`, {
+    return this.secureRequest<any>(`/events/${eventId}/budget/update/`, {
       method: 'PUT',
       body: JSON.stringify({ allocations }),
     });

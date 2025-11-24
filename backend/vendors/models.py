@@ -110,5 +110,22 @@ class VendorProfile(models.Model):
     def __str__(self):
         return f"Profile for {self.user.email if self.user else 'Unknown'}"
 
-
-
+class CalendarEvent(models.Model):
+    # booking = models.ForeignKey('booking_models.Booking', on_delete=models.CASCADE, null=True, blank=True, db_column='booking_id')
+    vendor = models.ForeignKey('authentication.CustomUser', on_delete=models.CASCADE, db_column='vendor_id')
+    event_date = models.DateTimeField()
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    location = models.CharField(max_length=255, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'vendors_calendarevent'
+        ordering = ['event_date']
+        indexes = [
+            models.Index(fields=['vendor', 'event_date']),
+            models.Index(fields=['event_date']),
+        ]
+    
+    def __str__(self):
+        return f"{self.title} - {self.event_date.date()}"

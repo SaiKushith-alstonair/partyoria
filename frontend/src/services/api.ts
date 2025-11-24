@@ -563,6 +563,31 @@ class ApiService {
       body: JSON.stringify(sanitizedData),
     });
   }
+
+  // Calendar API
+  async get(endpoint: string): Promise<any> {
+    return this.request(endpoint);
+  }
+
+  async post(endpoint: string, data: any): Promise<any> {
+    return this.request(endpoint, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async put(endpoint: string, data: any): Promise<any> {
+    return this.request(endpoint, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async delete(endpoint: string): Promise<any> {
+    return this.request(endpoint, {
+      method: 'DELETE',
+    });
+  }
 }
 
 // Helper function to convert EventFormData to ApiEvent

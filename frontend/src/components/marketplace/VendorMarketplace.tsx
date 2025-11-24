@@ -330,14 +330,21 @@ const VendorMarketplace = () => {
   };
 
   const applyClientFilters = (vendorsList) => {
+    console.log('Applying client filters:', filters);
+    console.log('Vendors before filtering:', vendorsList.length);
+    
     return vendorsList.filter(vendor => {
+      console.log('Checking vendor:', vendor.full_name, 'Business:', vendor.business, 'Services:', vendor.services?.length);
+      
       // Skip vendors with no services
       if (!vendor.services || vendor.services.length === 0) {
+        console.log('Filtered out - no services');
         return false;
       }
       
-      // Category filter
-      if (filters.category !== "All" && vendor.business !== filters.category) {
+      // Category filter - case insensitive comparison
+      if (filters.category !== "All" && vendor.business?.toLowerCase() !== filters.category.toLowerCase()) {
+        console.log('Filtered out - category mismatch:', vendor.business, '!==', filters.category);
         return false;
       }
       
@@ -363,8 +370,27 @@ const VendorMarketplace = () => {
         }
       }
       
-      // Price range filter - backend already handles this, skip client-side filtering
-      // to avoid double-filtering that removes valid results
+      // Price range filter - apply client-side since backend expects different format
+      if (filters.priceRange !== "all") {
+        const totalPrice = calculateTotalPrice(vendor.services);
+        if (totalPrice > 0) {
+          try {
+            const [minPrice, maxPrice] = filters.priceRange.split('-').map(Number);
+            if (maxPrice && totalPrice > maxPrice) {
+              return false;
+            }
+            if (minPrice && totalPrice < minPrice) {
+              return false;
+            }
+          } catch (e) {
+            // If price range format is just a number (max budget), treat as max limit
+            const maxBudget = Number(filters.priceRange);
+            if (!isNaN(maxBudget) && totalPrice > maxBudget) {
+              return false;
+            }
+          }
+        }
+      }
       
       return true;
     });
