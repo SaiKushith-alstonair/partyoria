@@ -425,37 +425,55 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
     }
   };
 
-  const validateCurrentStep = (): boolean => {
+  const validateStep = (stepId: FormStep): { isValid: boolean; hasErrors: boolean } => {
     const stepErrors: ValidationErrors = {};
     
-    if (currentStep === 'basic') {
+    if (stepId === 'basic') {
       if (!formData.eventName.trim()) stepErrors.eventName = 'Event name is required';
       if (!formData.clientName.trim()) stepErrors.clientName = 'Client name is required';
       if (!formData.clientEmail.trim()) stepErrors.clientEmail = 'Email is required';
       if (!formData.clientPhone.trim()) stepErrors.clientPhone = 'Phone is required';
       if (!formData.attendees || formData.attendees <= 0) stepErrors.attendees = 'Valid number of attendees required (minimum 1)';
-    } else if (currentStep === 'location') {
+    } else if (stepId === 'location') {
       if (!formData.state.trim()) stepErrors.venue = 'State is required';
       if (!formData.city.trim()) stepErrors.venue = 'City is required';
-    } else if (currentStep === 'duration') {
+    } else if (stepId === 'duration') {
       if (!formData.dateTime) stepErrors.dateTime = 'Date & time is required';
       if (!formData.duration) stepErrors.duration = 'Duration is required';
-    } else if (currentStep === 'budget') {
+    } else if (stepId === 'budget') {
       if (!formData.budget || formData.budget <= 0) stepErrors.budget = 'Valid budget amount required (minimum ₹1)';
-    } else if (currentStep === 'thankyou') {
-      // Planning choice step - no validation needed
-    } else if (currentStep === 'tradition') {
-      // Tradition step is optional, no validation needed
-    } else if (currentStep === 'food') {
-      // Food preferences are optional, no validation needed
-    } else if (currentStep === 'requirements') {
-      // Requirements are optional, no validation needed
-    } else if (currentStep === 'timeline') {
-      // Timeline details are optional, no validation needed
     }
     
-    setErrors(stepErrors);
-    return Object.keys(stepErrors).length === 0;
+    return {
+      isValid: Object.keys(stepErrors).length === 0,
+      hasErrors: Object.keys(stepErrors).length > 0
+    };
+  };
+
+  const validateCurrentStep = (): boolean => {
+    const { isValid, hasErrors } = validateStep(currentStep);
+    if (hasErrors) {
+      const stepErrors: ValidationErrors = {};
+      
+      if (currentStep === 'basic') {
+        if (!formData.eventName.trim()) stepErrors.eventName = 'Event name is required';
+        if (!formData.clientName.trim()) stepErrors.clientName = 'Client name is required';
+        if (!formData.clientEmail.trim()) stepErrors.clientEmail = 'Email is required';
+        if (!formData.clientPhone.trim()) stepErrors.clientPhone = 'Phone is required';
+        if (!formData.attendees || formData.attendees <= 0) stepErrors.attendees = 'Valid number of attendees required (minimum 1)';
+      } else if (currentStep === 'location') {
+        if (!formData.state.trim()) stepErrors.venue = 'State is required';
+        if (!formData.city.trim()) stepErrors.venue = 'City is required';
+      } else if (currentStep === 'duration') {
+        if (!formData.dateTime) stepErrors.dateTime = 'Date & time is required';
+        if (!formData.duration) stepErrors.duration = 'Duration is required';
+      } else if (currentStep === 'budget') {
+        if (!formData.budget || formData.budget <= 0) stepErrors.budget = 'Valid budget amount required (minimum ₹1)';
+      }
+      
+      setErrors(stepErrors);
+    }
+    return isValid;
   };
 
   const handleNextStep = () => {
@@ -662,17 +680,27 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
         {getVisibleSteps().map((step, index) => {
           const isCompleted = completedSteps.has(step.id);
           const isCurrent = step.id === currentStep;
+          const { hasErrors } = validateStep(step.id);
+          const showError = hasErrors && (isCompleted || isCurrent);
+          
           return (
             <div key={step.id} className="flex flex-col items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-all ${
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-all relative ${
+                showError ? 'bg-red-500 text-white animate-pulse' :
                 isCompleted ? 'bg-green-500 text-white' :
                 isCurrent ? 'bg-violet-500 text-white' :
                 'bg-gray-200 text-gray-500'
               }`}>
-                {isCompleted ? <CheckCircle size={16} /> : step.icon}
+                {showError ? '⚠️' : isCompleted ? '✓' : step.icon}
+                {showError && (
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-600 rounded-full animate-ping"></div>
+                )}
               </div>
               <span className={`text-xs mt-1 text-center max-w-16 ${
-                isCurrent ? 'text-violet-600 font-medium' : 'text-gray-500'
+                showError ? 'text-red-600 font-medium' :
+                isCurrent ? 'text-violet-600 font-medium' : 
+                isCompleted ? 'text-green-600 font-medium' :
+                'text-gray-500'
               }`}>
                 {step.title}
               </span>
@@ -685,6 +713,13 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
 
   const renderBasicDetailsStep = () => (
     <div className="space-y-6">
+      <div className="text-center mb-8">
+        <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+          <span className="text-2xl">👤</span>
+        </div>
+        <p className="text-gray-600">Let's start with your basic information</p>
+      </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -856,6 +891,12 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
   const renderLocationStep = () => {
     return (
       <div className="space-y-6">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <span className="text-2xl">📍</span>
+          </div>
+          <p className="text-gray-600">Choose your event location</p>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -914,6 +955,13 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
     
     return (
       <div className="space-y-8">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <span className="text-2xl">📅</span>
+          </div>
+          <p className="text-gray-600">When is your special day?</p>
+        </div>
+        
         {/* Year Selection */}
         {formData.dateTime !== 'not-confirmed' && (
         <div>
@@ -1090,16 +1138,23 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
 
   const renderBudgetStep = () => {
     const budgetRanges = [
-      { value: 50000, label: 'Under ₹50,000' },
-      { value: 100000, label: '₹50,000 - ₹1,00,000' },
-      { value: 200000, label: '₹1,00,000 - ₹2,00,000' },
-      { value: 500000, label: '₹2,00,000 - ₹5,00,000' },
-      { value: 1000000, label: '₹5,00,000 - ₹10,00,000' },
-      { value: 0, label: 'Custom Budget' }
+      { value: 50000, label: 'Under ₹50,000', icon: '💰' },
+      { value: 100000, label: '₹50,000 - ₹1,00,000', icon: '💵' },
+      { value: 200000, label: '₹1,00,000 - ₹2,00,000', icon: '💸' },
+      { value: 500000, label: '₹2,00,000 - ₹5,00,000', icon: '💎' },
+      { value: 1000000, label: '₹5,00,000 - ₹10,00,000', icon: '👑' },
+      { value: 0, label: 'Custom Budget', icon: '✏️' }
     ];
     
     return (
       <div className="space-y-8">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <span className="text-2xl">💰</span>
+          </div>
+          <p className="text-gray-600">What's your budget range?</p>
+        </div>
+        
         {/* Budget Selection */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-3">💰 Budget Range *</label>
@@ -1117,13 +1172,16 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
                     handleInputChange('budget', formData.budget === range.value ? 0 : range.value);
                   }
                 }}
-                className={`p-4 text-left rounded-xl border-2 font-medium transition-all ${
+                className={`p-4 text-left rounded-xl border-2 font-medium transition-all hover:scale-105 ${
                   (range.value !== 0 && formData.budget === range.value) || (range.value === 0 && isCustomBudget)
-                    ? 'border-[#C4A661] bg-[#C4A661] text-white'
-                    : 'border-gray-300 bg-white text-gray-700 hover:border-[#C4A661]'
+                    ? 'border-[#C4A661] bg-[#C4A661] text-white shadow-lg'
+                    : 'border-gray-300 bg-white text-gray-700 hover:border-[#C4A661] hover:shadow-md'
                 }`}
               >
-                {range.label}
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{range.icon}</span>
+                  <span>{range.label}</span>
+                </div>
               </button>
             ))}
           </div>
@@ -1709,6 +1767,13 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
     
     return (
       <div className="space-y-8">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <span className="text-2xl">🎨</span>
+          </div>
+          <p className="text-gray-600">Choose your style and tradition</p>
+        </div>
+        
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-3">Tradition & Style</label>
           <p className="text-sm text-gray-600 mb-4">Choose a style that matches your vision for this {subsection?.name.toLowerCase()}</p>
@@ -1723,13 +1788,13 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
                   const newValue = formData.traditionStyle === style.style_name ? '' : style.style_name;
                   handleInputChange('traditionStyle', newValue);
                 }}
-                className={`p-4 text-center rounded-xl border-2 font-medium transition-all ${
+                className={`p-4 text-center rounded-xl border-2 font-medium transition-all hover:scale-105 ${
                   formData.traditionStyle === style.style_name
-                    ? 'border-[#C4A661] bg-[#C4A661] text-white'
-                    : 'border-gray-300 bg-white text-gray-700 hover:border-[#C4A661]'
+                    ? 'border-[#C4A661] bg-[#C4A661] text-white shadow-lg'
+                    : 'border-gray-300 bg-white text-gray-700 hover:border-[#C4A661] hover:shadow-md'
                 }`}
               >
-
+                <div className="text-2xl mb-2">{getStyleIcon(style.style_name)}</div>
                 <div className="text-sm font-medium">{style.style_name}</div>
                 <div className="text-xs mt-1 opacity-75">{style.description}</div>
               </button>
@@ -1769,6 +1834,13 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
     
     return (
       <div className="space-y-8">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <span className="text-2xl">🍽️</span>
+          </div>
+          <p className="text-gray-600">What are your food preferences?</p>
+        </div>
+        
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-3">🍽️ Food Preferences</label>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -1783,10 +1855,10 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
                     : [...current, pref.name];
                   handleInputChange('foodPreferences', updated);
                 }}
-                className={`p-4 text-center rounded-xl border-2 font-medium transition-all ${
+                className={`p-4 text-center rounded-xl border-2 font-medium transition-all hover:scale-105 ${
                   (formData.foodPreferences || []).includes(pref.name)
-                    ? 'border-[#C4A661] bg-[#C4A661] text-white'
-                    : 'border-gray-300 bg-white text-gray-700 hover:border-[#C4A661]'
+                    ? 'border-[#C4A661] bg-[#C4A661] text-white shadow-lg'
+                    : 'border-gray-300 bg-white text-gray-700 hover:border-[#C4A661] hover:shadow-md'
                 }`}
               >
                 <div className="text-2xl mb-2">{pref.icon}</div>
@@ -1915,6 +1987,9 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
     return (
       <div className="space-y-6">
         <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <span className="text-2xl">🎯</span>
+          </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Special Requirements</h2>
           <p className="text-gray-600">Select requirements and vendor services for your {subsection?.name.toLowerCase()}</p>
         </div>
@@ -2075,6 +2150,9 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
     return (
       <div className="space-y-6">
         <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-rose-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <span className="text-2xl">⏰</span>
+          </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Event Timeline</h2>
           <p className="text-gray-600">Plan your event schedule and timing</p>
         </div>
@@ -2192,6 +2270,9 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
   const renderReviewStep = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
+        <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+          <span className="text-2xl">📋</span>
+        </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Review Your Event</h2>
         <p className="text-gray-600">Please review all details before creating your event</p>
       </div>
