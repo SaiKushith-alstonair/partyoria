@@ -1,3 +1,4 @@
 @echo off
-echo Starting Redis Server...
-redis-server --port 6379 --bind 127.0.0.1
+echo Starting Redis Server on port 6380...
+cd "C:\Program Files\Redis"
+.\redis-server.exe --port 6380
