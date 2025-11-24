@@ -17,7 +17,7 @@ interface BudgetManagerProps {
   initialAllocations?: BudgetAllocation;
 }
 
-// UNIFIED CATEGORY RULES - Matches backend exactly
+// DYNAMIC CATEGORY RULES - Market-adjusted
 const CATEGORY_RULES = {
   catering: { min: 20, max: 50, required: true, label: 'Catering & Food' },
   venue: { min: 15, max: 40, required: true, label: 'Venue & Location' },
@@ -28,7 +28,7 @@ const CATEGORY_RULES = {
   lighting: { min: 2, max: 12, required: false, label: 'Lighting' },
   transportation: { min: 2, max: 15, required: false, label: 'Transportation' },
   security: { min: 1, max: 10, required: false, label: 'Security' },
-  contingency: { min: 5, max: 15, required: true, label: 'Contingency' }
+  contingency: { min: 5, max: 25, required: true, label: 'Contingency' }
 };
 
 // UNIFIED EVENT PRESETS - Matches backend exactly
@@ -50,6 +50,8 @@ export const BudgetManager: React.FC<BudgetManagerProps> = ({
   const [lockedCategories, setLockedCategories] = useState<Set<string>>(new Set());
   const [validating, setValidating] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [marketInsights, setMarketInsights] = useState<any>(null);
+  const [loadingInsights, setLoadingInsights] = useState(false);
 
   const validateAllocation = useCallback((allocs: BudgetAllocation): string[] => {
     const validationErrors: string[] = [];
@@ -146,8 +148,76 @@ export const BudgetManager: React.FC<BudgetManagerProps> = ({
   const totalPercentage = Object.values(allocations).reduce((sum, val) => sum + val, 0);
   const isValid = errors.length === 0;
 
+  // Load market insights on component mount
+  useEffect(() => {
+    const loadMarketInsights = async () => {
+      try {
+        setLoadingInsights(true);
+        const response = await fetch(`/api/events/${eventId}/budget/insights/`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setMarketInsights(data.insights);
+        }
+      } catch (error) {
+        console.error('Failed to load market insights:', error);
+      } finally {
+        setLoadingInsights(false);
+      }
+    };
+
+    loadMarketInsights();
+  }, [eventId]);
+
   return (
     <div className="space-y-6">
+      {/* Market Intelligence Panel */}
+      {marketInsights && (
+        <Card className="p-4 mb-4 bg-blue-50 border-blue-200">
+          <h3 className="font-bold text-blue-800 mb-3">🎯 Market Intelligence</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
+            <div className="text-center">
+              <div className="font-bold text-blue-600">{(marketInsights.location_factor * 100).toFixed(0)}%</div>
+              <div className="text-xs text-blue-700">Location Factor</div>
+            </div>
+            <div className="text-center">
+              <div className="font-bold text-orange-600">{(marketInsights.seasonal_factor * 100).toFixed(0)}%</div>
+              <div className="text-xs text-orange-700">Seasonal Factor</div>
+            </div>
+            <div className="text-center">
+              <div className="font-bold text-green-600">{marketInsights.recommendations.length}</div>
+              <div className="text-xs text-green-700">Recommendations</div>
+            </div>
+            <div className="text-center">
+              <div className="font-bold text-red-600">{marketInsights.risk_factors.length}</div>
+              <div className="text-xs text-red-700">Risk Factors</div>
+            </div>
+          </div>
+          
+          {marketInsights.risk_factors.length > 0 && (
+            <div className="mb-2">
+              <div className="text-sm font-medium text-red-700 mb-1">⚠️ Risk Factors:</div>
+              {marketInsights.risk_factors.map((risk: string, index: number) => (
+                <div key={index} className="text-xs text-red-600 ml-4">• {risk}</div>
+              ))}
+            </div>
+          )}
+          
+          {marketInsights.recommendations.length > 0 && (
+            <div>
+              <div className="text-sm font-medium text-green-700 mb-1">💡 Recommendations:</div>
+              {marketInsights.recommendations.map((rec: string, index: number) => (
+                <div key={index} className="text-xs text-green-600 ml-4">• {rec}</div>
+              ))}
+            </div>
+          )}
+        </Card>
+      )}
+
       {/* Quick Actions */}
       <Card className="p-4">
         <div className="flex flex-wrap gap-2 mb-4">
@@ -163,6 +233,11 @@ export const BudgetManager: React.FC<BudgetManagerProps> = ({
           <Button onClick={rebalanceUnlocked} variant="outline" size="sm">
             Rebalance Unlocked
           </Button>
+          {loadingInsights && (
+            <Button variant="outline" size="sm" disabled>
+              Loading Market Data...
+            </Button>
+          )}
         </div>
         
         {/* Summary */}
@@ -174,10 +249,20 @@ export const BudgetManager: React.FC<BudgetManagerProps> = ({
           <div className="p-3 bg-blue-100 rounded">
             <div className="font-bold">{formatCurrency(totalBudget)}</div>
             <div className="text-sm">Total Budget</div>
+            {marketInsights && (
+              <div className="text-xs text-blue-600 mt-1">
+                Market Adjusted
+              </div>
+            )}
           </div>
           <div className="p-3 bg-purple-100 rounded">
             <div className="font-bold">{Object.keys(allocations).length}</div>
             <div className="text-sm">Categories</div>
+            {marketInsights && (
+              <div className="text-xs text-purple-600 mt-1">
+                Intelligence Active
+              </div>
+            )}
           </div>
         </div>
       </Card>
@@ -236,6 +321,14 @@ export const BudgetManager: React.FC<BudgetManagerProps> = ({
                   />
                   <div className="text-xs text-gray-500 mt-1">
                     Range: {rule.min}% - {rule.max}%
+                    {marketInsights?.market_comparison?.[category] && (
+                      <div className="text-xs text-blue-600 mt-1">
+                        Market: ₹{Math.round(marketInsights.market_comparison[category].market_avg)}/guest
+                        {marketInsights.market_comparison[category].volatility > 0.3 && (
+                          <span className="text-orange-500 ml-1">⚠️ High Volatility</span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
 

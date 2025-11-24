@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import EventViewSet, QuoteRequestViewSet, RSVPViewSet, event_milestones
 
-from .budget_api import allocate_budget, update_budget, validate_budget, rebalance_budget, get_budget_summary
+from .budget_api import allocate_budget, update_budget, validate_budget, rebalance_budget, get_budget_summary, get_market_insights, get_competitor_analysis
 from .quote_views import (
     send_quote_requests, vendor_quote_requests, quote_request_detail,
     submit_quote, event_quotes, accept_quote
@@ -30,8 +30,10 @@ urlpatterns = [
     path('events/<int:event_id>/budget/allocate/', allocate_budget, name='allocate-budget'),
     path('events/<int:event_id>/budget/update/', update_budget, name='update-budget'),
     path('events/<int:event_id>/budget/rebalance/', rebalance_budget, name='rebalance-budget'),
-    path('events/<int:event_id>/budget/summary/', get_budget_summary, name='budget-summary'),
+    path('events/<int:event_id>/budget/summary/', get_budget_summary, name='budget_summary'),
+    path('events/<int:event_id>/budget/insights/', get_market_insights, name='market-insights'),
     path('budget/validate/', validate_budget, name='validate-budget'),
+    path('budget/competitor-analysis/', get_competitor_analysis, name='competitor-analysis'),
     
     # Quote Management endpoints - MUST BE BEFORE ROUTER
     path('events/<int:event_id>/send-quotes/', send_quote_requests, name='send-quote-requests'),

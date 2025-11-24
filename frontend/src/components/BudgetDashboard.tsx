@@ -125,6 +125,141 @@ export const BudgetDashboard: React.FC<BudgetDashboardProps> = ({ event, onClose
     return 'Needs Improvement';
   };
 
+  const getCategoryDetails = (category: string) => {
+    const categoryBreakdown = {
+      'catering': {
+        title: 'Catering & Food Services',
+        includes: [
+          'Welcome drinks & refreshments',
+          'Main course meals (Veg/Non-veg)',
+          'Desserts & sweets',
+          'Service staff & waiters',
+          'Crockery & cutlery',
+          'Food presentation & setup'
+        ],
+        icon: '🍽️'
+      },
+      'venue': {
+        title: 'Venue & Location',
+        includes: [
+          'Hall/venue rental charges',
+          'Basic facilities & amenities',
+          'Parking arrangements',
+          'Security deposit',
+          'Cleaning services',
+          'Basic lighting & power'
+        ],
+        icon: '🏛️'
+      },
+      'decorations': {
+        title: 'Decorations & Styling',
+        includes: [
+          'Entrance decoration',
+          'Stage/backdrop setup',
+          'Floral arrangements',
+          'Table centerpieces',
+          'Draping & fabric work',
+          'Theme-based props'
+        ],
+        icon: '🎨'
+      },
+      'photography': {
+        title: 'Photography & Videography',
+        includes: [
+          'Professional photographer',
+          'Candid photography',
+          'Event videography',
+          'Photo editing & processing',
+          'Digital album creation',
+          'Online gallery access'
+        ],
+        icon: '📸'
+      },
+      'entertainment': {
+        title: 'Entertainment & Music',
+        includes: [
+          'DJ services & music',
+          'Sound system setup',
+          'Microphones & speakers',
+          'Background music',
+          'Dance floor setup',
+          'Entertainment coordination'
+        ],
+        icon: '🎵'
+      },
+      'audio_visual': {
+        title: 'Audio Visual Equipment',
+        includes: [
+          'Projectors & screens',
+          'Sound amplification',
+          'Wireless microphones',
+          'Presentation setup',
+          'Technical support',
+          'Equipment maintenance'
+        ],
+        icon: '🎤'
+      },
+      'lighting': {
+        title: 'Lighting & Effects',
+        includes: [
+          'Ambient lighting setup',
+          'Spotlight arrangements',
+          'LED effects & colors',
+          'Stage lighting',
+          'Mood lighting',
+          'Light coordination'
+        ],
+        icon: '💡'
+      },
+      'transportation': {
+        title: 'Transportation Services',
+        includes: [
+          'Guest transportation',
+          'Vendor coordination',
+          'Equipment transport',
+          'Parking management',
+          'Route planning',
+          'Driver services'
+        ],
+        icon: '🚗'
+      },
+      'security': {
+        title: 'Security & Safety',
+        includes: [
+          'Security personnel',
+          'Crowd management',
+          'Safety protocols',
+          'Emergency response',
+          'Asset protection',
+          'Access control'
+        ],
+        icon: '🛡️'
+      },
+      'contingency': {
+        title: 'Contingency & Emergency Fund',
+        includes: [
+          '🚨 Emergency fund (5-7% of budget)',
+          '🔄 Last-minute vendor changes',
+          '📈 Price fluctuations & market changes',
+          '💡 Additional requirements during event',
+          '🎁 Service tips & staff gratuity',
+          '⚡ Unexpected expenses & overruns',
+          '🛡️ Insurance against vendor failures',
+          '📞 Emergency vendor bookings',
+          '🎯 Quality upgrades if needed',
+          '💸 Payment processing fees'
+        ],
+        icon: '🛡️'
+      }
+    };
+    
+    return categoryBreakdown[category] || {
+      title: category.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      includes: ['Service details not specified'],
+      icon: '📋'
+    };
+  };
+
   const getCategoryRequirements = (category: string, specialRequirements: any) => {
     const categoryMap: { [key: string]: string[] } = {
       'catering': ['cake', 'catering', 'food', 'menu-planning-design', 'menu'],
@@ -477,6 +612,7 @@ onClick={onClose}
                 <div className="space-y-8">
                   {budgetSummary.allocations.map((allocation, index) => {
                     const categoryRequirements = getCategoryRequirements(allocation.category, event.special_requirements);
+                    const categoryDetails = getCategoryDetails(allocation.category);
                     const colors = [
                       'from-purple-500 to-pink-500',
                       'from-purple-600 to-pink-600', 
@@ -485,22 +621,19 @@ onClick={onClose}
                       'from-pink-600 to-purple-600',
                       'from-pink-700 to-purple-700'
                     ];
-                    const bgColors = [
-                      'from-white to-white',
-                      'from-white to-white',
-                      'from-white to-white', 
-                      'from-white to-white',
-                      'from-white to-white',
-                      'from-white to-white'
-                    ];
                     return (
                       <Card key={allocation.category} className={`p-6 bg-gradient-to-br from-white to-purple-50 border border-purple-200 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2`}>
-                        <div className="flex justify-between items-center mb-4">
+                        <div className="flex justify-between items-center mb-6">
                           <div className="flex items-center">
-                            <div className={`w-4 h-4 bg-gradient-to-r ${colors[index % colors.length]} rounded-full mr-3`}></div>
-                            <span className="font-bold text-gray-900 text-xl">
-                              {allocation.category}
-                            </span>
+                            <div className="text-3xl mr-4">{categoryDetails.icon}</div>
+                            <div>
+                              <h3 className="font-bold text-gray-900 text-xl">
+                                {categoryDetails.title}
+                              </h3>
+                              <p className="text-sm text-gray-600 mt-1">
+                                {categoryDetails.includes.length} services included
+                              </p>
+                            </div>
                           </div>
                           <div className="text-right">
                             <div className="font-bold text-2xl text-gray-900">
@@ -508,6 +641,30 @@ onClick={onClose}
                             </div>
                             <div className="text-2xl font-bold text-white bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-2 rounded-lg shadow-lg">
                               {Number(allocation.percentage).toFixed(1)}%
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* What's Included Section - Always Show */}
+                        <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-5 mb-6 border border-purple-100">
+                          <h4 className="font-bold text-purple-800 mb-4 flex items-center">
+                            <svg className="w-5 h-5 mr-2 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                            </svg>
+                            What's Included in This Budget ({categoryDetails.includes.length} services)
+                          </h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {categoryDetails.includes.map((item, itemIndex) => (
+                              <div key={itemIndex} className="flex items-start bg-white rounded-lg p-3 shadow-sm border border-purple-100 hover:shadow-md transition-shadow">
+                                <div className={`w-3 h-3 bg-gradient-to-r ${colors[index % colors.length]} rounded-full mr-3 mt-1 flex-shrink-0`}></div>
+                                <span className="text-sm text-gray-700 font-medium leading-relaxed">{item}</span>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="mt-4 p-3 bg-white rounded-lg border border-purple-100">
+                            <div className="text-xs text-gray-600">
+                              <strong>💡 Note:</strong> This budget covers all essential services for {categoryDetails.title.toLowerCase()}. 
+                              Actual costs may vary based on vendor selection and specific requirements.
                             </div>
                           </div>
                         </div>
@@ -527,22 +684,22 @@ onClick={onClose}
                           </div>
                         </div>
 
-                        {/* Enhanced Requirements Details */}
+                        {/* Your Specific Requirements */}
                         {categoryRequirements.length > 0 && (
-                          <div className="bg-gradient-to-br from-purple-50 to-pink-50 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-purple-200">
-                            <h4 className="font-bold text-purple-800 mb-3 flex items-center">
-                              <svg className="w-5 h-5 mr-2 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 mb-6 border border-blue-200">
+                            <h4 className="font-bold text-blue-800 mb-4 flex items-center">
+                              <svg className="w-5 h-5 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd"/>
                               </svg>
-                              Included Services & Requirements
+                              Your Specific Requirements
                             </h4>
                             <div className="space-y-3">
                               {categoryRequirements.map((req, reqIndex) => (
-                                <div key={reqIndex} className="bg-gradient-to-r from-white to-purple-50 rounded-lg p-3 shadow-md border border-purple-100">
+                                <div key={reqIndex} className="bg-white rounded-lg p-4 shadow-sm border border-blue-100">
                                   <div className="flex justify-between items-start">
                                     <div className="flex-1">
                                       <div className="flex items-center mb-2">
-                                        <div className={`w-3 h-3 bg-gradient-to-r ${colors[index % colors.length]} rounded-full mr-2`}></div>
+                                        <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
                                         <span className="font-semibold text-gray-800">{req.name}</span>
                                       </div>
                                       {req.details && (
@@ -574,53 +731,57 @@ onClick={onClose}
                           </div>
                         )}
 
-                        {/* View Vendors Button */}
-                        <div className="mt-4 pt-4 border-t border-purple-200">
-                          <Button 
-                            onClick={() => {
-                              const categoryMap: Record<string, string> = {
-                                'catering': 'Catering',
-                                'photography': 'Photography',
-                                'videography': 'Videography',
-                                'decorations': 'Decoration',
-                                'decoration': 'Decoration',
-                                'entertainment': 'DJ',
-                                'music_dj': 'DJ',
-                                'dj': 'DJ',
-                                'beauty_services': 'Makeup Artist',
-                                'makeup': 'Makeup Artist',
-                                'event_coordination': 'Event Manager',
-                                'flowers': 'Florist',
-                                'florist': 'Florist'
-                              };
-                              const vendorCategory = categoryMap[allocation.category.toLowerCase()] || allocation.category;
-                              const budgetAmount = Number(allocation.amount);
-                              window.location.href = `/vendor-marketplace?category=${vendorCategory}&price_range=0-${budgetAmount}&eventId=${event.id}`;
-                            }}
-                            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold shadow-lg"
-                          >
-                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                            View Available Vendors
-                          </Button>
-                        </div>
 
-                        {/* Enhanced Cost Breakdown */}
-                        <div className="mt-4 pt-4 border-t border-purple-200">
-                          <div className="grid grid-cols-2 gap-6">
-                            <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg p-3 text-center shadow-md">
-                              <div className="text-sm font-medium text-purple-700 mb-1">Per Guest Cost</div>
-                              <div className="text-lg font-bold text-purple-900">
-                                {formatCurrency(Number(allocation.amount) / budgetSummary.event.attendees)}
-                              </div>
+
+                        {/* Cost Breakdown & Actions */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-purple-200">
+                          <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg p-4 text-center shadow-md">
+                            <div className="text-sm font-medium text-purple-700 mb-1">Per Guest Cost</div>
+                            <div className="text-lg font-bold text-purple-900">
+                              {formatCurrency(Number(allocation.amount) / budgetSummary.event.attendees)}
                             </div>
-                            <div className="bg-gradient-to-r from-pink-100 to-purple-100 rounded-lg p-3 text-center shadow-md">
-                              <div className="text-sm font-medium text-pink-700 mb-1">Per Hour Cost</div>
-                              <div className="text-lg font-bold text-pink-900">
-                                {formatCurrency(Number(allocation.amount) / budgetSummary.event.duration)}
-                              </div>
+                            <div className="text-xs text-purple-600 mt-1">
+                              For {budgetSummary.event.attendees} guests
                             </div>
+                          </div>
+                          <div className="bg-gradient-to-r from-pink-100 to-purple-100 rounded-lg p-4 text-center shadow-md">
+                            <div className="text-sm font-medium text-pink-700 mb-1">Per Hour Cost</div>
+                            <div className="text-lg font-bold text-pink-900">
+                              {formatCurrency(Number(allocation.amount) / budgetSummary.event.duration)}
+                            </div>
+                            <div className="text-xs text-pink-600 mt-1">
+                              For {budgetSummary.event.duration} hours
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-center">
+                            <Button 
+                              onClick={() => {
+                                const categoryMap: Record<string, string> = {
+                                  'catering': 'Catering',
+                                  'photography': 'Photography',
+                                  'videography': 'Videography',
+                                  'decorations': 'Decoration',
+                                  'decoration': 'Decoration',
+                                  'entertainment': 'DJ',
+                                  'music_dj': 'DJ',
+                                  'dj': 'DJ',
+                                  'beauty_services': 'Makeup Artist',
+                                  'makeup': 'Makeup Artist',
+                                  'event_coordination': 'Event Manager',
+                                  'flowers': 'Florist',
+                                  'florist': 'Florist'
+                                };
+                                const vendorCategory = categoryMap[allocation.category.toLowerCase()] || allocation.category;
+                                const budgetAmount = Number(allocation.amount);
+                                window.location.href = `/vendor-marketplace?category=${vendorCategory}&price_range=0-${budgetAmount}&eventId=${event.id}`;
+                              }}
+                              className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold shadow-lg"
+                            >
+                              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                              </svg>
+                              Find Vendors
+                            </Button>
                           </div>
                         </div>
                       </Card>

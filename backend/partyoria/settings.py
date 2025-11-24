@@ -97,21 +97,21 @@ DATABASES = {
     }
 }
 
-# Caching configuration - Redis for production performance
+# Caching configuration - Redis enabled
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': config('REDIS_URL', default='redis://127.0.0.1:6379/1'),
+        'LOCATION': 'redis://127.0.0.1:6380/0',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             'CONNECTION_POOL_KWARGS': {
                 'max_connections': 20,
                 'retry_on_timeout': True,
+                'socket_connect_timeout': 5,
+                'socket_timeout': 5,
             },
-            'COMPRESSOR': 'django_redis.compressors.zlib.ZlibCompressor',
-            'SERIALIZER': 'django_redis.serializers.json.JSONSerializer',
         },
-        'KEY_PREFIX': 'partyoria',
+        'KEY_PREFIX': 'budget',
         'TIMEOUT': 300,
     }
 }

@@ -34,15 +34,11 @@ def allocate_budget(request, event_id):
         # Extract location and date for market intelligence
         location = form_data.get('location') or form_data.get('city') or 'tier3'
         event_date = None
-        date_field = form_data.get('event_date') or form_data.get('dateTime')
-        if date_field:
+        if form_data.get('event_date'):
             try:
                 from datetime import datetime
-                if 'T' in date_field:
-                    event_date = datetime.fromisoformat(date_field.replace('Z', '+00:00'))
-                else:
-                    event_date = datetime.strptime(date_field, '%Y-%m-%d')
-            except (ValueError, TypeError, KeyError):
+                event_date = datetime.fromisoformat(form_data['event_date'].replace('Z', '+00:00'))
+            except:
                 event_date = None
         
         # Get selected services
@@ -54,13 +50,6 @@ def allocate_budget(request, event_id):
         
         if event.selected_services:
             selected_services.extend(event.selected_services)
-        
-        # For engagement events, ensure we have core services
-        if form_data.get('sub_type') == 'engagement' or event_type in ['birthday', 'wedding']:
-            core_services = ['Photography Services', 'Decoration', 'Catering Services', 'Venues', 'Entertainment']
-            for service in core_services:
-                if service not in selected_services:
-                    selected_services.append(service)
         
         # Generate INTELLIGENT MARKET-DRIVEN allocation
         budget_items = BudgetEngine.smart_allocate(
@@ -84,8 +73,8 @@ def allocate_budget(request, event_id):
                 'user': event.user,
                 'total_budget': total_budget,
                 'allocations': breakdown,
-                'allocation_method': 'market_intelligent',
-                'efficiency_score': BudgetEngine._calculate_efficiency_score(breakdown, location, attendees),
+                'allocation_method': 'smart',
+                'efficiency_score': 90.0,
                 'cost_per_guest': total_budget / attendees if attendees > 0 else None,
                 'cost_per_hour': total_budget / duration if duration > 0 else None
             }
@@ -95,8 +84,6 @@ def allocate_budget(request, event_id):
             budget.allocations = breakdown
             budget.allocation_method = 'market_intelligent'
             budget.efficiency_score = BudgetEngine._calculate_efficiency_score(breakdown, location, attendees)
-            budget.cost_per_guest = total_budget / attendees if attendees > 0 else None
-            budget.cost_per_hour = total_budget / duration if duration > 0 else None
             budget.save()
         
         return Response({
@@ -243,82 +230,51 @@ def get_budget_summary(request, event_id):
     try:
         event = get_object_or_404(Event, id=event_id, user=request.user)
         
-        # Always generate fresh allocation for accurate data
-        form_data = event.form_data or {}
-        event_type = form_data.get('event_type') or event.event_type or 'corporate'
-        total_budget = Decimal(str(form_data.get('budget') or event.total_budget or 200000))
-        attendees = int(form_data.get('attendees') or event.attendees or 50)
-        
-        duration_raw = form_data.get('duration') or event.duration or 4
-        if isinstance(duration_raw, str) and '-' in duration_raw:
-            duration = int(duration_raw.split('-')[0])
-        else:
-            duration = int(duration_raw)
-        
-        selected_services = []
-        if event.special_requirements:
-            for req_id, req_data in event.special_requirements.items():
-                if isinstance(req_data, dict) and req_data.get('selected'):
-                    selected_services.append(req_id)
-        
-        if event.selected_services:
-            selected_services.extend(event.selected_services)
-        
-        # Ensure core services for engagement/social events
-        if form_data.get('sub_type') == 'engagement' or event_type in ['birthday', 'wedding']:
-            core_services = ['Photography Services', 'Decoration', 'Catering Services', 'Venues', 'Entertainment']
-            for service in core_services:
-                if service not in selected_services:
-                    selected_services.append(service)
-        
-        # Extract location for market intelligence
-        location = form_data.get('location') or form_data.get('city') or 'tier3'
-        event_date = None
-        date_field = form_data.get('event_date') or form_data.get('dateTime')
-        if date_field:
-            try:
-                from datetime import datetime
-                if 'T' in date_field:
-                    event_date = datetime.fromisoformat(date_field.replace('Z', '+00:00'))
-                else:
-                    event_date = datetime.strptime(date_field, '%Y-%m-%d')
-            except (ValueError, TypeError, KeyError):
-                event_date = None
-        
-        budget_items = BudgetEngine.smart_allocate(
-            event_type=event_type,
-            selected_services=selected_services,
-            total_budget=total_budget,
-            attendees=attendees,
-            duration=duration,
-            special_requirements=event.special_requirements,
-            location=location,
-            event_date=event_date
-        )
-        
-        allocations = BudgetEngine.calculate_breakdown(budget_items)
-        
-        # Save/update budget in database
-        budget, created = Budget.objects.get_or_create(
-            event=event,
-            defaults={
-                'user': event.user,
-                'total_budget': total_budget,
-                'allocations': allocations,
-                'allocation_method': 'market_intelligent',
-                'efficiency_score': BudgetEngine._calculate_efficiency_score(allocations, location, attendees),
-                'cost_per_guest': total_budget / attendees if attendees > 0 else None,
-                'cost_per_hour': total_budget / duration if duration > 0 else None
-            }
-        )
-        
-        if not created:
-            budget.allocations = allocations
-            budget.allocation_method = 'market_intelligent'
-            budget.efficiency_score = BudgetEngine._calculate_efficiency_score(allocations, location, attendees)
-            budget.cost_per_guest = total_budget / attendees if attendees > 0 else None
-            budget.cost_per_hour = total_budget / duration if duration > 0 else None
-            budget.save()
+        # Try to get existing budget
+        try:
+            budget = Budget.objects.get(event=event)
+            allocations = budget.allocations or {}
+        except Budget.DoesNotExist:
+            # Generate new allocation
+            form_data = event.form_data or {}
+            event_type = form_data.get('event_type') or event.event_type or 'corporate'
+            total_budget = Decimal(str(form_data.get('budget') or event.total_budget or 200000))
+            attendees = int(form_data.get('attendees') or event.attendees or 50)
+            
+            duration_raw = form_data.get('duration') or event.duration or 4
+            if isinstance(duration_raw, str) and '-' in duration_raw:
+                duration = int(duration_raw.split('-')[0])
+            else:
+                duration = int(duration_raw)
+            
+            selected_services = []
+            if event.special_requirements:
+                for req_id, req_data in event.special_requirements.items():
+                    if isinstance(req_data, dict) and req_data.get('selected'):
+                        selected_services.append(req_id)
+            
+            # Extract location for market intelligence
+            location = form_data.get('location') or form_data.get('city') or 'tier3'
+            event_date = None
+            if form_data.get('event_date'):
+                try:
+                    from datetime import datetime
+                    event_date = datetime.fromisoformat(form_data['event_date'].replace('Z', '+00:00'))
+                except:
+                    event_date = None
+            
+            budget_items = BudgetEngine.smart_allocate(
+                event_type=event_type,
+                selected_services=selected_services,
+                total_budget=total_budget,
+                attendees=attendees,
+                duration=duration,
+                special_requirements=event.special_requirements,
+                location=location,
+                event_date=event_date
+            )
+            
+            allocations = BudgetEngine.calculate_breakdown(budget_items)
         
         total_allocated = sum(float(alloc.get('amount', 0)) for alloc in allocations.values())
         remaining = float(event.total_budget) - total_allocated
@@ -374,15 +330,11 @@ def get_market_insights(request, event_id):
         total_budget = Decimal(str(form_data.get('budget') or event.total_budget or 200000))
         
         event_date = None
-        date_field = form_data.get('event_date') or form_data.get('dateTime')
-        if date_field:
+        if form_data.get('event_date'):
             try:
                 from datetime import datetime
-                if 'T' in date_field:
-                    event_date = datetime.fromisoformat(date_field.replace('Z', '+00:00'))
-                else:
-                    event_date = datetime.strptime(date_field, '%Y-%m-%d')
-            except (ValueError, TypeError, KeyError):
+                event_date = datetime.fromisoformat(form_data['event_date'].replace('Z', '+00:00'))
+            except:
                 event_date = None
         
         insights = BudgetEngine.get_market_insights(
@@ -431,3 +383,4 @@ def get_competitor_analysis(request):
             'success': False,
             'error': str(e)
         }, status=status.HTTP_400_BAD_REQUEST)
+
