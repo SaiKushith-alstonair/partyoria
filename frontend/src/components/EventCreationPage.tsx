@@ -99,6 +99,8 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [apiVendorServices, setApiVendorServices] = useState<any[]>([]);
   const [loadingVendors, setLoadingVendors] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
 
   const section = apiSections.find((s: any) => s.id === sectionId) || eventSections.find((s: any) => s.id === sectionId);
   const subsection = section?.subsections.find((s: any) => s.id === subsectionId);
@@ -192,6 +194,53 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
     return `${currentStepNumber}/${totalSteps}`;
   };
 
+  // AUTO-SAVE: Save form data every 10 seconds
+  useEffect(() => {
+    if (!isDirty || !formData.eventName) return;
+    
+    const autoSave = setTimeout(() => {
+      const draftKey = `draft_${sectionId}_${subsectionId}_${editEventId || 'new'}`;
+      const draftData = {
+        formData,
+        currentStep,
+        selectedVenueTypes,
+        selectedVendorServices,
+        wantsDetailedPlanning,
+        completedSteps: Array.from(completedSteps),
+        timestamp: Date.now()
+      };
+      
+      localStorage.setItem(draftKey, JSON.stringify(draftData));
+      setLastSaved(new Date());
+      setIsDirty(false);
+    }, 10000);
+    
+    return () => clearTimeout(autoSave);
+  }, [formData, currentStep, selectedVenueTypes, selectedVendorServices, wantsDetailedPlanning, completedSteps, isDirty, sectionId, subsectionId, editEventId]);
+  
+  // AUTO-SAVE: Save on page unload
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (isDirty && formData.eventName) {
+        const draftKey = `draft_${sectionId}_${subsectionId}_${editEventId || 'new'}`;
+        const draftData = {
+          formData,
+          currentStep,
+          selectedVenueTypes,
+          selectedVendorServices,
+          wantsDetailedPlanning,
+          completedSteps: Array.from(completedSteps),
+          timestamp: Date.now()
+        };
+        localStorage.setItem(draftKey, JSON.stringify(draftData));
+      }
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [formData, currentStep, selectedVenueTypes, selectedVendorServices, wantsDetailedPlanning, completedSteps, isDirty, sectionId, subsectionId, editEventId]);
+  
+  // AUTO-SAVE: Load draft on mount
   useEffect(() => {
     const loadEventData = async () => {
       if (subsectionId) {
@@ -204,6 +253,36 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
       // Defer heavy API calls
       setTimeout(() => loadStates(), 100);
 
+      // Try to load draft first
+      const draftKey = `draft_${sectionId}_${subsectionId}_${editEventId || 'new'}`;
+      const savedDraft = localStorage.getItem(draftKey);
+      
+      if (savedDraft && !editEventId) {
+        try {
+          const draftData = JSON.parse(savedDraft);
+          const draftAge = Date.now() - draftData.timestamp;
+          
+          // Only restore drafts less than 24 hours old
+          if (draftAge < 24 * 60 * 60 * 1000) {
+            setFormData(draftData.formData);
+            setCurrentStep(draftData.currentStep);
+            setSelectedVenueTypes(draftData.selectedVenueTypes || []);
+            setSelectedVendorServices(draftData.selectedVendorServices || []);
+            setWantsDetailedPlanning(draftData.wantsDetailedPlanning);
+            setCompletedSteps(new Set(draftData.completedSteps || []));
+            setLastSaved(new Date(draftData.timestamp));
+            console.log('Restored draft from:', new Date(draftData.timestamp));
+            return;
+          } else {
+            // Clean up old draft
+            localStorage.removeItem(draftKey);
+          }
+        } catch (error) {
+          console.warn('Failed to restore draft:', error);
+          localStorage.removeItem(draftKey);
+        }
+      }
+      
       if (editEventId) {
         try {
           const { apiService, convertApiEventToFormData } = await import('../services/api');
@@ -335,6 +414,7 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
 
   const handleInputChange = (field: keyof EventFormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    setIsDirty(true);
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
     }
@@ -382,6 +462,7 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
     if (!validateCurrentStep()) return;
     
     setCompletedSteps(prev => new Set([...prev, currentStep]));
+    setIsDirty(true);
     
     if (currentStep === 'budget' && !editEventId) {
       setCurrentStep('thankyou');
@@ -527,11 +608,21 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
         console.log('=== UPDATING EVENT ===');
         savedEvent = await apiService.updateEvent(parseInt(editEventId), apiEvent);
         console.log('Event updated successfully:', savedEvent);
+        
+        // Clear draft after successful update
+        const draftKey = `draft_${sectionId}_${subsectionId}_${editEventId || 'new'}`;
+        localStorage.removeItem(draftKey);
+        
         setCurrentStep('success');
       } else {
         console.log('=== CREATING NEW EVENT ===');
         savedEvent = await apiService.createEvent(apiEvent);
         console.log('Event created successfully:', savedEvent);
+        
+        // Clear draft after successful creation
+        const draftKey = `draft_${sectionId}_${subsectionId}_${editEventId || 'new'}`;
+        localStorage.removeItem(draftKey);
+        
         setCurrentStep('success');
       }
     } catch (error: unknown) {
@@ -2823,6 +2914,13 @@ const EventCreationPage: React.FC<EventCreationPageProps> = ({
           {/* Main Form Card */}
           <div className="max-w-4xl mx-auto pt-4 lg:pt-8 pb-20">
             <div className="bg-white rounded-2xl lg:rounded-3xl p-4 lg:p-6 border border-gray-200 shadow-lg lg:shadow-2xl">
+              {/* Auto-save indicator */}
+              {lastSaved && (
+                <div className="mb-2 text-xs text-gray-500 text-right">
+                  Draft saved {lastSaved.toLocaleTimeString()}
+                </div>
+              )}
+              
               {/* Progress Indicator */}
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-2">
